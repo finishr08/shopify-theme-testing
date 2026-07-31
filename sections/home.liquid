@@ -1,0 +1,1390 @@
+{% comment %}
+  Professional custom homepage section
+  Built from scratch for Shopify Skeleton theme.
+{% endcomment %}
+
+<section
+  id="home-section-{{ section.id }}"
+  class="custom-home"
+  style="
+    --page-background: {{ section.settings.page_background }};
+    --surface-color: {{ section.settings.surface_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --accent-hover: {{ section.settings.accent_hover }};
+    --button-text-color: {{ section.settings.button_text_color }};
+    --section-radius: {{ section.settings.section_radius }}px;
+    --content-width: {{ section.settings.content_width }}px;
+  "
+>
+  <div class="custom-home__hero">
+    <div class="custom-home__hero-background">
+      {% if section.settings.hero_image != blank %}
+        {{
+          section.settings.hero_image
+          | image_url: width: 2400
+          | image_tag:
+            class: 'custom-home__hero-image',
+            widths: '750, 1100, 1500, 2000, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            fetchpriority: 'high',
+            alt: section.settings.hero_heading
+        }}
+      {% else %}
+        <div class="custom-home__hero-placeholder">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'custom-home__placeholder-svg' }}
+        </div>
+      {% endif %}
+
+      <div
+        class="custom-home__hero-overlay"
+        style="opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+      ></div>
+    </div>
+
+    <div class="custom-home__container custom-home__hero-inner">
+      <div class="custom-home__hero-content">
+        {% if section.settings.hero_eyebrow != blank %}
+          <p class="custom-home__eyebrow">
+            {{ section.settings.hero_eyebrow | escape }}
+          </p>
+        {% endif %}
+
+        {% if section.settings.hero_heading != blank %}
+          <h1 class="custom-home__hero-heading">
+            {{ section.settings.hero_heading | escape }}
+          </h1>
+        {% endif %}
+
+        {% if section.settings.hero_text != blank %}
+          <div class="custom-home__hero-text">
+            {{ section.settings.hero_text }}
+          </div>
+        {% endif %}
+
+        {% if section.settings.primary_button_label != blank or section.settings.secondary_button_label != blank %}
+          <div class="custom-home__hero-actions">
+            {% if section.settings.primary_button_label != blank %}
+              <a
+                class="custom-home__button custom-home__button--primary"
+                href="{{ section.settings.primary_button_link | default: routes.all_products_collection_url }}"
+              >
+                {{ section.settings.primary_button_label | escape }}
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 12H19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  ></path>
+                  <path
+                    d="M14 7L19 12L14 17"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </svg>
+              </a>
+            {% endif %}
+
+            {% if section.settings.secondary_button_label != blank %}
+              <a
+                class="custom-home__button custom-home__button--secondary"
+                href="{{ section.settings.secondary_button_link | default: routes.root_url }}"
+              >
+                {{ section.settings.secondary_button_label | escape }}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_trust_points %}
+          <div class="custom-home__trust">
+            <div class="custom-home__trust-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12.5L9.5 17L19 7.5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+
+              <span>{{ section.settings.trust_point_one | escape }}</span>
+            </div>
+
+            <div class="custom-home__trust-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12.5L9.5 17L19 7.5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+
+              <span>{{ section.settings.trust_point_two | escape }}</span>
+            </div>
+
+            <div class="custom-home__trust-item">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12.5L9.5 17L19 7.5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+
+              <span>{{ section.settings.trust_point_three | escape }}</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if section.blocks.size > 0 %}
+    <div class="custom-home__features">
+      <div class="custom-home__container">
+        <div class="custom-home__section-heading">
+          {% if section.settings.features_eyebrow != blank %}
+            <p class="custom-home__section-eyebrow">
+              {{ section.settings.features_eyebrow | escape }}
+            </p>
+          {% endif %}
+
+          {% if section.settings.features_heading != blank %}
+            <h2 class="custom-home__section-title">
+              {{ section.settings.features_heading | escape }}
+            </h2>
+          {% endif %}
+
+          {% if section.settings.features_text != blank %}
+            <div class="custom-home__section-text">
+              {{ section.settings.features_text }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="custom-home__features-grid">
+          {% for block in section.blocks %}
+            <article
+              class="custom-home__feature-card"
+              {{ block.shopify_attributes }}
+            >
+              <div class="custom-home__feature-number">
+                {{ forloop.index | prepend: '0' }}
+              </div>
+
+              <div class="custom-home__feature-icon">
+                {% case block.settings.icon %}
+                  {% when 'shipping' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3 6H15V17H3V6Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                      <path
+                        d="M15 10H19L22 13V17H15V10Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                      <circle
+                        cx="7"
+                        cy="18"
+                        r="2"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                      ></circle>
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="2"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                      ></circle>
+                    </svg>
+
+                  {% when 'quality' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M12 3L15 6L19 6.5L19.5 10.5L22 13L19.5 16L19 20L15 20.5L12 23L9 20.5L5 20L4.5 16L2 13L4.5 10.5L5 6.5L9 6L12 3Z"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linejoin="round"
+                      ></path>
+                      <path
+                        d="M8.5 13L11 15.5L16 10"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </svg>
+
+                  {% when 'support' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M4 13V11C4 6.6 7.6 3 12 3C16.4 3 20 6.6 20 11V13"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                      ></path>
+                      <path
+                        d="M4 13H7V19H5C4.4 19 4 18.6 4 18V13Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                      <path
+                        d="M20 13H17V19H19C19.6 19 20 18.6 20 18V13Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                      <path
+                        d="M17 19C16 21 14.5 21 12 21"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                      ></path>
+                    </svg>
+
+                  {% when 'secure' %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M12 3L20 6V11C20 16.2 16.7 20.5 12 22C7.3 20.5 4 16.2 4 11V6L12 3Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                      <path
+                        d="M8.5 12L11 14.5L15.5 10"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </svg>
+
+                  {% else %}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M12 3L14.7 8.5L21 9.4L16.5 13.8L17.5 20L12 17.1L6.5 20L7.5 13.8L3 9.4L9.3 8.5L12 3Z"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linejoin="round"
+                      ></path>
+                    </svg>
+                {% endcase %}
+              </div>
+
+              {% if block.settings.heading != blank %}
+                <h3 class="custom-home__feature-title">
+                  {{ block.settings.heading | escape }}
+                </h3>
+              {% endif %}
+
+              {% if block.settings.text != blank %}
+                <div class="custom-home__feature-text">
+                  {{ block.settings.text }}
+                </div>
+              {% endif %}
+
+              {% if block.settings.link_label != blank %}
+                <a
+                  class="custom-home__feature-link"
+                  href="{{ block.settings.link_url | default: routes.root_url }}"
+                >
+                  {{ block.settings.link_label | escape }}
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 12H19"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    ></path>
+                    <path
+                      d="M14 7L19 12L14 17"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                </a>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_promo %}
+    <div class="custom-home__promo">
+      <div class="custom-home__container">
+        <div class="custom-home__promo-card">
+          <div class="custom-home__promo-content">
+            {% if section.settings.promo_eyebrow != blank %}
+              <p class="custom-home__promo-eyebrow">
+                {{ section.settings.promo_eyebrow | escape }}
+              </p>
+            {% endif %}
+
+            {% if section.settings.promo_heading != blank %}
+              <h2 class="custom-home__promo-title">
+                {{ section.settings.promo_heading | escape }}
+              </h2>
+            {% endif %}
+
+            {% if section.settings.promo_text != blank %}
+              <div class="custom-home__promo-text">
+                {{ section.settings.promo_text }}
+              </div>
+            {% endif %}
+
+            {% if section.settings.promo_button_label != blank %}
+              <a
+                class="custom-home__button custom-home__button--light"
+                href="{{ section.settings.promo_button_link | default: routes.all_products_collection_url }}"
+              >
+                {{ section.settings.promo_button_label | escape }}
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 12H19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  ></path>
+                  <path
+                    d="M14 7L19 12L14 17"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </svg>
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="custom-home__promo-visual" aria-hidden="true">
+            <div class="custom-home__promo-circle custom-home__promo-circle--one"></div>
+            <div class="custom-home__promo-circle custom-home__promo-circle--two"></div>
+
+            <svg
+              viewBox="0 0 300 300"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="62"
+                y="68"
+                width="176"
+                height="164"
+                rx="28"
+                stroke="currentColor"
+                stroke-width="3"
+              ></rect>
+              <path
+                d="M97 68C97 39 120 20 150 20C180 20 203 39 203 68"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              ></path>
+              <path
+                d="M100 116H200"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              ></path>
+              <path
+                d="M150 144V192"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              ></path>
+              <path
+                d="M126 168H174"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .custom-home {
+    width: 100%;
+    overflow: hidden;
+    color: var(--heading-color);
+    background: var(--page-background);
+  }
+
+  .custom-home *,
+  .custom-home *::before,
+  .custom-home *::after {
+    box-sizing: border-box;
+  }
+
+  .custom-home img,
+  .custom-home svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  .custom-home__container {
+    width: min(
+      calc(100% - 40px),
+      var(--content-width)
+    );
+    margin: 0 auto;
+  }
+
+  .custom-home__hero {
+    position: relative;
+    display: grid;
+    min-height: 760px;
+    overflow: hidden;
+    background: #111111;
+  }
+
+  .custom-home__hero-background,
+  .custom-home__hero-inner {
+    grid-area: 1 / 1;
+  }
+
+  .custom-home__hero-background {
+    position: relative;
+    min-height: inherit;
+  }
+
+  .custom-home__hero-image,
+  .custom-home__hero-placeholder,
+  .custom-home__placeholder-svg {
+    width: 100%;
+    height: 100%;
+    min-height: 760px;
+  }
+
+  .custom-home__hero-image {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .custom-home__placeholder-svg {
+    object-fit: cover;
+    background: #d8d8d8;
+  }
+
+  .custom-home__hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.86) 0%,
+        rgba(0, 0, 0, 0.56) 48%,
+        rgba(0, 0, 0, 0.08) 100%
+      );
+  }
+
+  .custom-home__hero-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    min-height: inherit;
+    align-items: center;
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+
+  .custom-home__hero-content {
+    width: min(100%, 760px);
+  }
+
+  .custom-home__eyebrow,
+  .custom-home__section-eyebrow,
+  .custom-home__promo-eyebrow {
+    margin: 0 0 18px;
+    color: var(--accent-color);
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.4;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .custom-home__hero-heading {
+    max-width: 850px;
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(52px, 7vw, 100px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+    text-wrap: balance;
+  }
+
+  .custom-home__hero-text {
+    max-width: 660px;
+    margin-top: 28px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 19px;
+    line-height: 1.7;
+  }
+
+  .custom-home__hero-text p,
+  .custom-home__section-text p,
+  .custom-home__feature-text p,
+  .custom-home__promo-text p {
+    margin: 0;
+  }
+
+  .custom-home__hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 36px;
+  }
+
+  .custom-home__button {
+    display: inline-flex;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 28px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .custom-home__button svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .custom-home__button:hover {
+    transform: translateY(-3px);
+  }
+
+  .custom-home__button--primary {
+    color: var(--button-text-color);
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+
+  .custom-home__button--primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  .custom-home__button--secondary {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+  }
+
+  .custom-home__button--secondary:hover {
+    color: var(--heading-color);
+    background: #ffffff;
+    border-color: #ffffff;
+  }
+
+  .custom-home__button--light {
+    color: var(--heading-color);
+    background: #ffffff;
+    border-color: #ffffff;
+  }
+
+  .custom-home__button--light:hover {
+    color: #ffffff;
+    background: transparent;
+  }
+
+  .custom-home__trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-top: 38px;
+  }
+
+  .custom-home__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .custom-home__trust-item svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-color);
+  }
+
+  .custom-home__features {
+    padding: 110px 0;
+    background: var(--page-background);
+  }
+
+  .custom-home__section-heading {
+    width: min(100%, 760px);
+    margin-bottom: 54px;
+  }
+
+  .custom-home__section-title {
+    margin: 0;
+    color: var(--heading-color);
+    font-size: clamp(38px, 5vw, 66px);
+    font-weight: 780;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .custom-home__section-text {
+    max-width: 650px;
+    margin-top: 20px;
+    color: var(--text-color);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .custom-home__features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .custom-home__feature-card {
+    position: relative;
+    min-height: 340px;
+    padding: 34px;
+    overflow: hidden;
+    background: var(--surface-color);
+    border: 1px solid rgba(20, 20, 20, 0.08);
+    border-radius: var(--section-radius);
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease;
+  }
+
+  .custom-home__feature-card:hover {
+    border-color: color-mix(in srgb, var(--accent-color) 45%, transparent);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.08);
+    transform: translateY(-8px);
+  }
+
+  .custom-home__feature-number {
+    position: absolute;
+    top: 24px;
+    right: 26px;
+    color: rgba(20, 20, 20, 0.08);
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .custom-home__feature-icon {
+    display: flex;
+    width: 58px;
+    height: 58px;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    border-radius: 18px;
+  }
+
+  .custom-home__feature-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .custom-home__feature-title {
+    margin: 34px 0 0;
+    color: var(--heading-color);
+    font-size: 24px;
+    font-weight: 740;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .custom-home__feature-text {
+    margin-top: 15px;
+    color: var(--text-color);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .custom-home__feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 25px;
+    color: var(--heading-color);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .custom-home__feature-link svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 180ms ease;
+  }
+
+  .custom-home__feature-link:hover {
+    color: var(--accent-color);
+  }
+
+  .custom-home__feature-link:hover svg {
+    transform: translateX(5px);
+  }
+
+  .custom-home__promo {
+    padding: 0 0 110px;
+    background: var(--page-background);
+  }
+
+  .custom-home__promo-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    min-height: 470px;
+    align-items: center;
+    overflow: hidden;
+    color: #ffffff;
+    background:
+      radial-gradient(
+        circle at 80% 15%,
+        color-mix(in srgb, var(--accent-color) 45%, transparent),
+        transparent 30%
+      ),
+      #111111;
+    border-radius: calc(var(--section-radius) + 8px);
+  }
+
+  .custom-home__promo-content {
+    position: relative;
+    z-index: 2;
+    padding: 70px;
+  }
+
+  .custom-home__promo-title {
+    max-width: 620px;
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 780;
+    line-height: 1.03;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .custom-home__promo-text {
+    max-width: 560px;
+    margin-top: 22px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .custom-home__promo-content .custom-home__button {
+    margin-top: 32px;
+  }
+
+  .custom-home__promo-visual {
+    position: relative;
+    display: flex;
+    min-height: 470px;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .custom-home__promo-visual > svg {
+    position: relative;
+    z-index: 2;
+    width: min(70%, 300px);
+  }
+
+  .custom-home__promo-circle {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .custom-home__promo-circle--one {
+    width: 330px;
+    height: 330px;
+    background: color-mix(in srgb, var(--accent-color) 28%, transparent);
+  }
+
+  .custom-home__promo-circle--two {
+    width: 430px;
+    height: 430px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .custom-home__button:focus-visible,
+  .custom-home__feature-link:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 4px;
+  }
+
+  @media screen and (max-width: 990px) {
+    .custom-home__hero {
+      min-height: 680px;
+    }
+
+    .custom-home__hero-image,
+    .custom-home__hero-placeholder,
+    .custom-home__placeholder-svg {
+      min-height: 680px;
+    }
+
+    .custom-home__features-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .custom-home__promo-card {
+      grid-template-columns: 1fr;
+    }
+
+    .custom-home__promo-content {
+      padding-bottom: 20px;
+    }
+
+    .custom-home__promo-visual {
+      min-height: 320px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .custom-home__container {
+      width: min(calc(100% - 30px), var(--content-width));
+    }
+
+    .custom-home__hero {
+      min-height: 720px;
+    }
+
+    .custom-home__hero-image,
+    .custom-home__hero-placeholder,
+    .custom-home__placeholder-svg {
+      min-height: 720px;
+    }
+
+    .custom-home__hero-image {
+      object-position: center;
+    }
+
+    .custom-home__hero-overlay {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.2) 0%,
+          rgba(0, 0, 0, 0.82) 70%,
+          rgba(0, 0, 0, 0.92) 100%
+        );
+    }
+
+    .custom-home__hero-inner {
+      align-items: flex-end;
+      padding-top: 80px;
+      padding-bottom: 60px;
+    }
+
+    .custom-home__hero-heading {
+      font-size: clamp(43px, 13vw, 65px);
+    }
+
+    .custom-home__hero-text {
+      margin-top: 22px;
+      font-size: 16px;
+    }
+
+    .custom-home__hero-actions {
+      flex-direction: column;
+      margin-top: 30px;
+    }
+
+    .custom-home__button {
+      width: 100%;
+    }
+
+    .custom-home__trust {
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .custom-home__features {
+      padding: 75px 0;
+    }
+
+    .custom-home__section-heading {
+      margin-bottom: 38px;
+    }
+
+    .custom-home__section-title {
+      font-size: 42px;
+    }
+
+    .custom-home__section-text {
+      font-size: 15px;
+    }
+
+    .custom-home__features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .custom-home__feature-card {
+      min-height: auto;
+      padding: 28px;
+    }
+
+    .custom-home__promo {
+      padding-bottom: 75px;
+    }
+
+    .custom-home__promo-content {
+      padding: 48px 26px 20px;
+    }
+
+    .custom-home__promo-title {
+      font-size: 42px;
+    }
+
+    .custom-home__promo-text {
+      font-size: 15px;
+    }
+
+    .custom-home__promo-visual {
+      min-height: 260px;
+    }
+
+    .custom-home__promo-circle--one {
+      width: 230px;
+      height: 230px;
+    }
+
+    .custom-home__promo-circle--two {
+      width: 290px;
+      height: 290px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .custom-home__button,
+    .custom-home__feature-card,
+    .custom-home__feature-link svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Professional homepage",
+  "tag": "section",
+  "class": "professional-homepage-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow",
+      "default": "Designed for modern living"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Heading",
+      "default": "Products built to improve your everyday"
+    },
+    {
+      "type": "richtext",
+      "id": "hero_text",
+      "label": "Description",
+      "default": "<p>Discover thoughtfully selected products combining modern design, reliable performance, and effortless convenience.</p>"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image overlay opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "text",
+      "id": "primary_button_label",
+      "label": "Primary button label",
+      "default": "Shop collection"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_label",
+      "label": "Secondary button label",
+      "default": "Explore more"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Trust points"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_points",
+      "label": "Show trust points",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_point_one",
+      "label": "First trust point",
+      "default": "Fast delivery"
+    },
+    {
+      "type": "text",
+      "id": "trust_point_two",
+      "label": "Second trust point",
+      "default": "Secure checkout"
+    },
+    {
+      "type": "text",
+      "id": "trust_point_three",
+      "label": "Third trust point",
+      "default": "Premium quality"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "text",
+      "id": "features_eyebrow",
+      "label": "Features eyebrow",
+      "default": "Why choose us"
+    },
+    {
+      "type": "text",
+      "id": "features_heading",
+      "label": "Features heading",
+      "default": "Everything you need, all in one place"
+    },
+    {
+      "type": "richtext",
+      "id": "features_text",
+      "label": "Features description",
+      "default": "<p>We focus on quality, convenience, and dependable service to give every customer a better shopping experience.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Promotional banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show promotional banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promo_eyebrow",
+      "label": "Promo eyebrow",
+      "default": "Limited collection"
+    },
+    {
+      "type": "text",
+      "id": "promo_heading",
+      "label": "Promo heading",
+      "default": "Upgrade your everyday essentials"
+    },
+    {
+      "type": "richtext",
+      "id": "promo_text",
+      "label": "Promo description",
+      "default": "<p>Explore products selected for style, performance, and lasting value.</p>"
+    },
+    {
+      "type": "text",
+      "id": "promo_button_label",
+      "label": "Promo button label",
+      "default": "Discover products"
+    },
+    {
+      "type": "url",
+      "id": "promo_button_link",
+      "label": "Promo button link"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "page_background",
+      "label": "Page background",
+      "default": "#f5f5f2"
+    },
+    {
+      "type": "color",
+      "id": "surface_color",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#151515"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#686868"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#f15a29"
+    },
+    {
+      "type": "color",
+      "id": "accent_hover",
+      "label": "Accent hover color",
+      "default": "#d94719"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Primary button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_radius",
+      "label": "Card corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content maximum width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1350
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "quality",
+          "options": [
+            {
+              "value": "quality",
+              "label": "Quality"
+            },
+            {
+              "value": "shipping",
+              "label": "Shipping"
+            },
+            {
+              "value": "support",
+              "label": "Support"
+            },
+            {
+              "value": "secure",
+              "label": "Security"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Premium quality"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Description",
+          "default": "<p>Carefully selected products designed to offer reliable quality and long-term value.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "default": "Learn more"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Professional homepage",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "quality",
+            "heading": "Premium quality",
+            "text": "<p>Carefully selected products designed to offer reliable quality and long-term value.</p>",
+            "link_label": "Learn more"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "shipping",
+            "heading": "Fast delivery",
+            "text": "<p>Efficient shipping and dependable order handling from purchase to delivery.</p>",
+            "link_label": "Shipping details"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "support",
+            "heading": "Helpful support",
+            "text": "<p>Friendly customer service ready to help whenever you need assistance.</p>",
+            "link_label": "Contact us"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

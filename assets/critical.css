@@ -1,17 +1,26 @@
 /** Critical CSS for the theme. This file is included on every page. */
 
-/* Reset styles inspired by https://www.joshwcomeau.com/css/custom-css-reset/ */
-* {
+/* Reset styles inspired by:
+   https://www.joshwcomeau.com/css/custom-css-reset/
+*/
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  padding: 0;
   margin: 0;
 }
 
+html {
+  width: 100%;
+  min-height: 100%;
+}
+
 body {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
   margin: 0;
-  padding: 0;
-  min-height: 100svh;
 }
 
 html:has(dialog[scroll-lock][open], details[scroll-lock][open]) {
@@ -30,24 +39,31 @@ svg {
 
 input,
 textarea,
-select {
+select,
+button {
   font: inherit;
+}
+
+input,
+textarea,
+select {
   border-radius: var(--style-border-radius-inputs);
 }
 
 select {
-  background-color: var(--color-background);
   color: currentcolor;
+  background-color: var(--color-background);
 }
 
 dialog {
-  background-color: var(--color-background);
   color: var(--color-foreground);
+  background-color: var(--color-background);
 }
 
 p {
   text-wrap: pretty;
 }
+
 p,
 h1,
 h2,
@@ -72,48 +88,104 @@ p:empty {
   margin-block-end: 0;
 }
 
-/** Theme styles below */
+/** Theme styles */
+
 body {
   font-family: var(--font-primary--family);
-  background-color: var(--color-background);
   color: var(--color-foreground);
+  background-color: var(--color-background);
 }
 
-/** Section layout utilities */
+/** Main content */
+
+main {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 /**
- * Setup a grid that enables both full-width and constrained layouts
- * depending on the class of the child elements.
+ * Shopify section layout
  *
- * By default, a minimum content margin is set on the left and right
- * sides of the section and the content is centered in the viewport to
- * not exceed the maximum page width.
- *
- * When a child element is given the `full-width` class, it will span
- * the entire viewport.
+ * All sections and their direct children now span the full available width.
+ * No automatic page margin or constrained center column is applied.
  */
+
 .shopify-section {
-  --content-width: min(
-    calc(var(--page-width) - var(--page-margin) * 2),
-    calc(100% - var(--page-margin) * 2)
-  );
-  --content-margin: minmax(var(--page-margin), 1fr);
-  --content-grid: var(--content-margin) var(--content-width)
-    var(--content-margin);
-
-  /* This is required to make <img> elements work as background images */
   position: relative;
-  grid-template-columns: var(--content-grid);
-  display: grid;
+  display: block;
   width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* Child elements, by default, are constrained to the central column of the grid. */
 .shopify-section > * {
-  grid-column: 2;
+  width: 100%;
+  max-width: none;
+  margin-right: 0;
+  margin-left: 0;
 }
 
-/* Child elements that use the full-width utility class span the entire viewport. */
-.shopify-section > .full-width {
-  grid-column: 1 / -1;
+/**
+ * Keep the full-width utility compatible with existing sections.
+ */
+
+.shopify-section > .full-width,
+.full-width {
+  width: 100%;
+  max-width: none;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/**
+ * Optional reusable content container.
+ *
+ * Use this class only inside sections where you intentionally want
+ * constrained content.
+ */
+
+.page-container {
+  width: 100%;
+  max-width: var(--page-width);
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: var(--page-margin);
+  padding-left: var(--page-margin);
+}
+
+/**
+ * Completely edge-to-edge utility.
+ */
+
+.edge-to-edge {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/** Accessibility */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+}
+
+/** Responsive media */
+
+@media screen and (max-width: 749px) {
+  .page-container {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
 }

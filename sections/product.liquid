@@ -1,50 +1,1631 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+  Professional product page section.
+  Built from scratch for Shopify Skeleton theme.
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_media = current_variant.featured_media | default: product.featured_media
+  assign product_form_id = 'ProductForm-' | append: section.id
+%}
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+<section
+  id="ProductSection-{{ section.id }}"
+  class="custom-product full-width"
+  data-section-id="{{ section.id }}"
+  data-product-url="{{ product.url }}"
+  style="
+    --product-background: {{ section.settings.background_color }};
+    --product-card-background: {{ section.settings.card_background }};
+    --product-heading-color: {{ section.settings.heading_color }};
+    --product-text-color: {{ section.settings.text_color }};
+    --product-muted-color: {{ section.settings.muted_color }};
+    --product-accent-color: {{ section.settings.accent_color }};
+    --product-button-background: {{ section.settings.button_background }};
+    --product-button-color: {{ section.settings.button_text_color }};
+    --product-button-hover: {{ section.settings.button_hover_background }};
+    --product-border-color: {{ section.settings.border_color }};
+    --product-radius: {{ section.settings.card_radius }}px;
+    --product-width: {{ section.settings.content_width }}px;
+  "
+>
+  <div class="custom-product__container">
+    <div class="custom-product__layout">
+      <div class="custom-product__media">
+        {% if product.media.size > 0 %}
+          <div class="custom-product__gallery">
+            {% if product.media.size > 1 %}
+              <div
+                class="custom-product__thumbnails"
+                role="list"
+                aria-label="Product media thumbnails"
+              >
+                {% for media in product.media %}
+                  {% if media.media_type == 'image' %}
+                    <button
+                      type="button"
+                      class="custom-product__thumbnail{% if media.id == featured_media.id %} is-active{% endif %}"
+                      data-product-thumbnail
+                      data-media-id="{{ media.id }}"
+                      aria-label="View image {{ forloop.index }}"
+                      aria-current="{% if media.id == featured_media.id %}true{% else %}false{% endif %}"
+                    >
+                      {{
+                        media.preview_image
+                        | image_url: width: 180
+                        | image_tag:
+                          loading: 'lazy',
+                          widths: '80, 120, 180',
+                          sizes: '80px',
+                          alt: media.alt
+                      }}
+                    </button>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+            <div class="custom-product__main-media">
+              {% for media in product.media %}
+                <div
+                  class="custom-product__media-item{% if media.id == featured_media.id %} is-active{% endif %}"
+                  data-product-media
+                  data-media-id="{{ media.id }}"
+                  {% unless media.id == featured_media.id %}
+                    hidden
+                  {% endunless %}
+                >
+                  {% case media.media_type %}
+                    {% when 'image' %}
+                      <button
+                        type="button"
+                        class="custom-product__image-button"
+                        data-product-zoom
+                        aria-label="Enlarge product image"
+                      >
+                        {{
+                          media
+                          | image_url: width: 1800
+                          | image_tag:
+                            class: 'custom-product__image',
+                            loading: 'eager',
+                            fetchpriority: 'high',
+                            widths: '550, 750, 1000, 1300, 1600, 1800',
+                            sizes: '(max-width: 989px) 100vw, 55vw',
+                            alt: media.alt
+                        }}
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
+                        <span class="custom-product__zoom-icon" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none">
+                            <circle
+                              cx="10.5"
+                              cy="10.5"
+                              r="6.5"
+                              stroke="currentColor"
+                              stroke-width="1.7"
+                            ></circle>
+                            <path
+                              d="M15.5 15.5L21 21"
+                              stroke="currentColor"
+                              stroke-width="1.7"
+                              stroke-linecap="round"
+                            ></path>
+                            <path
+                              d="M10.5 7.5V13.5M7.5 10.5H13.5"
+                              stroke="currentColor"
+                              stroke-width="1.7"
+                              stroke-linecap="round"
+                            ></path>
+                          </svg>
+                        </span>
+                      </button>
+
+                    {% when 'video' %}
+                      {{
+                        media
+                        | video_tag:
+                          class: 'custom-product__video',
+                          controls: true,
+                          preload: 'metadata'
+                      }}
+
+                    {% when 'external_video' %}
+                      {{
+                        media
+                        | external_video_tag:
+                          class: 'custom-product__video'
+                      }}
+
+                    {% when 'model' %}
+                      {{
+                        media
+                        | model_viewer_tag:
+                          class: 'custom-product__model',
+                          reveal: 'interaction',
+                          toggleable: true
+                      }}
+                  {% endcase %}
+                </div>
+              {% endfor %}
+
+              {% if section.settings.show_sale_badge and current_variant.compare_at_price > current_variant.price %}
+                <span class="custom-product__badge custom-product__badge--sale">
+                  Sale
+                </span>
+              {% endif %}
+
+              {% unless current_variant.available %}
+                <span class="custom-product__badge custom-product__badge--sold-out">
+                  Sold out
+                </span>
+              {% endunless %}
+            </div>
+          </div>
+        {% else %}
+          <div class="custom-product__placeholder">
+            {{ 'product-1' | placeholder_svg_tag: 'custom-product__placeholder-svg' }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="custom-product__information">
+        <div class="custom-product__information-inner">
+          {% if section.settings.show_vendor and product.vendor != blank %}
+            <p class="custom-product__vendor">
+              {{ product.vendor | escape }}
+            </p>
           {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
 
-    <input type="text" name="quantity" min="1" value="1">
+          <h1 class="custom-product__title">
+            {{ product.title | escape }}
+          </h1>
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+          {% if section.settings.show_rating %}
+            <div class="custom-product__rating">
+              <div class="custom-product__stars" aria-hidden="true">
+                {% for index in (1..5) %}
+                  <svg viewBox="0 0 20 20">
+                    <path
+                      d="M10 1.7L12.5 6.8L18.1 7.6L14 11.6L15 17.2L10 14.6L5 17.2L6 11.6L1.9 7.6L7.5 6.8L10 1.7Z"
+                      fill="currentColor"
+                    ></path>
+                  </svg>
+                {% endfor %}
+              </div>
+
+              <span>{{ section.settings.rating_text | escape }}</span>
+            </div>
+          {% endif %}
+
+          <div class="custom-product__price-wrapper">
+            <span
+              class="custom-product__price"
+              data-product-price
+            >
+              {{ current_variant.price | money }}
+            </span>
+
+            <span
+              class="custom-product__compare-price"
+              data-product-compare-price
+              {% unless current_variant.compare_at_price > current_variant.price %}
+                hidden
+              {% endunless %}
+            >
+              {% if current_variant.compare_at_price > current_variant.price %}
+                {{ current_variant.compare_at_price | money }}
+              {% endif %}
+            </span>
+
+            {% if section.settings.show_price_note %}
+              <span class="custom-product__price-note">
+                {{ section.settings.price_note | escape }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_short_description and product.description != blank %}
+            <div class="custom-product__short-description">
+              {{ product.description | strip_html | truncatewords: section.settings.description_words }}
+            </div>
+          {% endif %}
+
+          {% form 'product',
+            product,
+            id: product_form_id,
+            class: 'custom-product__form',
+            novalidate: 'novalidate'
+          %}
+            <input
+              type="hidden"
+              name="id"
+              value="{{ current_variant.id }}"
+              data-variant-id
+            >
+
+            {% unless product.has_only_default_variant %}
+              <div class="custom-product__variant-picker">
+                <label
+                  class="custom-product__field-label"
+                  for="VariantSelect-{{ section.id }}"
+                >
+                  Choose an available option
+                </label>
+
+                <div class="custom-product__select-wrapper">
+                  <select
+                    id="VariantSelect-{{ section.id }}"
+                    class="custom-product__select"
+                    data-variant-select
+                  >
+                    {% for variant in product.variants %}
+                      <option
+                        value="{{ variant.id }}"
+                        data-price="{{ variant.price }}"
+                        data-price-formatted="{{ variant.price | money | escape }}"
+                        data-compare-price="{{ variant.compare_at_price | default: 0 }}"
+                        data-compare-price-formatted="{{ variant.compare_at_price | money | escape }}"
+                        data-available="{{ variant.available }}"
+                        data-sku="{{ variant.sku | escape }}"
+                        data-media-id="{{ variant.featured_media.id }}"
+                        data-url="{{ variant.url }}"
+                        data-inventory="{{ variant.inventory_quantity }}"
+                        {% if variant.id == current_variant.id %}
+                          selected
+                        {% endif %}
+                      >
+                        {{ variant.title }}
+                        —
+                        {{ variant.price | money }}
+                        {% unless variant.available %}
+                          — Sold out
+                        {% endunless %}
+                      </option>
+                    {% endfor %}
+                  </select>
+
+                  <svg
+                    class="custom-product__select-icon"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 7.5L10 12.5L15 7.5"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            {% endunless %}
+
+            <div class="custom-product__availability-row">
+              <div
+                class="custom-product__availability{% if current_variant.available %} is-available{% else %} is-unavailable{% endif %}"
+                data-product-availability
+                role="status"
+              >
+                <span class="custom-product__availability-dot"></span>
+
+                <span data-product-availability-text>
+                  {% if current_variant.available %}
+                    {% if current_variant.inventory_management and current_variant.inventory_quantity > 0 %}
+                      {% if current_variant.inventory_quantity <= section.settings.low_stock_threshold %}
+                        Only {{ current_variant.inventory_quantity }} left in stock
+                      {% else %}
+                        In stock and ready to ship
+                      {% endif %}
+                    {% else %}
+                      Available
+                    {% endif %}
+                  {% else %}
+                    Currently unavailable
+                  {% endif %}
+                </span>
+              </div>
+
+              {% if section.settings.show_sku %}
+                <p
+                  class="custom-product__sku"
+                  data-product-sku-wrapper
+                  {% if current_variant.sku == blank %}
+                    hidden
+                  {% endif %}
+                >
+                  SKU:
+                  <span data-product-sku>{{ current_variant.sku }}</span>
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="custom-product__purchase-row">
+              <div class="custom-product__quantity">
+                <label
+                  class="custom-product__field-label"
+                  for="Quantity-{{ section.id }}"
+                >
+                  Quantity
+                </label>
+
+                <div class="custom-product__quantity-control">
+                  <button
+                    type="button"
+                    class="custom-product__quantity-button"
+                    data-quantity-minus
+                    aria-label="Decrease quantity"
+                  >
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path
+                        d="M4 10H16"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      ></path>
+                    </svg>
+                  </button>
+
+                  <input
+                    id="Quantity-{{ section.id }}"
+                    class="custom-product__quantity-input"
+                    type="number"
+                    name="quantity"
+                    value="1"
+                    min="1"
+                    inputmode="numeric"
+                    data-quantity-input
+                  >
+
+                  <button
+                    type="button"
+                    class="custom-product__quantity-button"
+                    data-quantity-plus
+                    aria-label="Increase quantity"
+                  >
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path
+                        d="M4 10H16M10 4V16"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                name="add"
+                class="custom-product__add-button"
+                data-add-to-cart
+                {% unless current_variant.available %}
+                  disabled
+                {% endunless %}
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M3 4H5L7.3 15.2C7.5 16.2 8.4 17 9.5 17H18C19 17 19.8 16.4 20.1 15.5L22 8H7"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                  <circle cx="10" cy="21" r="1.3" fill="currentColor"></circle>
+                  <circle cx="18" cy="21" r="1.3" fill="currentColor"></circle>
+                </svg>
+
+                <span data-add-to-cart-text>
+                  {% if current_variant.available %}
+                    Add to cart
+                  {% else %}
+                    Sold out
+                  {% endif %}
+                </span>
+              </button>
+            </div>
+
+            {% if section.settings.show_dynamic_checkout %}
+              <div
+                class="custom-product__dynamic-checkout"
+                data-dynamic-checkout
+                {% unless current_variant.available %}
+                  hidden
+                {% endunless %}
+              >
+                {{ form | payment_button }}
+              </div>
+            {% endif %}
+
+            {% if form.errors %}
+              <div class="custom-product__form-error" role="alert">
+                {{ form.errors | default_errors }}
+              </div>
+            {% endif %}
+          {% endform %}
+
+          {% if section.settings.show_benefits %}
+            <div class="custom-product__benefits">
+              <div class="custom-product__benefit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M3 7H15V18H3V7Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  ></path>
+                  <path
+                    d="M15 11H19L22 14V18H15V11Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  ></path>
+                  <circle cx="7" cy="19" r="2" stroke="currentColor" stroke-width="1.6"></circle>
+                  <circle cx="18" cy="19" r="2" stroke="currentColor" stroke-width="1.6"></circle>
+                </svg>
+
+                <div>
+                  <strong>{{ section.settings.delivery_heading | escape }}</strong>
+                  <span>{{ section.settings.delivery_text | escape }}</span>
+                </div>
+              </div>
+
+              <div class="custom-product__benefit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M12 3L20 6V11C20 16.2 16.7 20.5 12 22C7.3 20.5 4 16.2 4 11V6L12 3Z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  ></path>
+                  <path
+                    d="M8.5 12L11 14.5L15.5 10"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </svg>
+
+                <div>
+                  <strong>{{ section.settings.secure_heading | escape }}</strong>
+                  <span>{{ section.settings.secure_text | escape }}</span>
+                </div>
+              </div>
+
+              <div class="custom-product__benefit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 8L3 11L6 14"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                  <path
+                    d="M3 11H15C18.3 11 21 13.7 21 17C21 20.3 18.3 23 15 23H11"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                  ></path>
+                </svg>
+
+                <div>
+                  <strong>{{ section.settings.returns_heading | escape }}</strong>
+                  <span>{{ section.settings.returns_text | escape }}</span>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if section.settings.show_description and product.description != blank %}
+            <details class="custom-product__accordion" open>
+              <summary>
+                <span>Product details</span>
+
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path
+                    d="M5 7.5L10 12.5L15 7.5"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>
+                </svg>
+              </summary>
+
+              <div class="custom-product__description rte">
+                {{ product.description }}
+              </div>
+            </details>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dialog
+    class="custom-product__lightbox"
+    data-product-lightbox
+    aria-label="Product image preview"
+  >
+    <button
+      type="button"
+      class="custom-product__lightbox-close"
+      data-lightbox-close
+      aria-label="Close image preview"
+    >
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M5 5L19 19M19 5L5 19"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        ></path>
+      </svg>
+    </button>
+
+    <img
+      class="custom-product__lightbox-image"
+      data-lightbox-image
+      src=""
+      alt=""
+      width="1800"
+      height="1800"
+    >
+  </dialog>
+</section>
+
+{% stylesheet %}
+  .custom-product {
+    width: 100%;
+    color: var(--product-heading-color);
+    background: var(--product-background);
+  }
+
+  .custom-product *,
+  .custom-product *::before,
+  .custom-product *::after {
+    box-sizing: border-box;
+  }
+
+  .custom-product button,
+  .custom-product input,
+  .custom-product select {
+    font: inherit;
+  }
+
+  .custom-product__container {
+    width: min(calc(100% - 48px), var(--product-width));
+    margin: 0 auto;
+    padding: 64px 0 96px;
+  }
+
+  .custom-product__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(390px, 0.9fr);
+    gap: clamp(40px, 6vw, 90px);
+    align-items: start;
+  }
+
+  .custom-product__media {
+    min-width: 0;
+  }
+
+  .custom-product__gallery {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .custom-product__thumbnails {
+    display: flex;
+    max-height: 760px;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .custom-product__thumbnail {
+    display: block;
+    width: 82px;
+    height: 98px;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--product-card-background);
+    border: 1px solid var(--product-border-color);
+    border-radius: 12px;
+    opacity: 0.65;
+    transition:
+      opacity 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .custom-product__thumbnail:hover,
+  .custom-product__thumbnail.is-active {
+    border-color: var(--product-accent-color);
+    opacity: 1;
+  }
+
+  .custom-product__thumbnail:hover {
+    transform: translateY(-2px);
+  }
+
+  .custom-product__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .custom-product__main-media {
+    position: relative;
+    overflow: hidden;
+    background: var(--product-card-background);
+    border: 1px solid var(--product-border-color);
+    border-radius: var(--product-radius);
+  }
+
+  .custom-product__media-item {
+    width: 100%;
+  }
+
+  .custom-product__image-button {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    cursor: zoom-in;
+    background: transparent;
+    border: 0;
+  }
+
+  .custom-product__image {
+    width: 100%;
+    height: auto;
+    min-height: 560px;
+    max-height: 820px;
+    object-fit: contain;
+  }
+
+  .custom-product__video,
+  .custom-product__model {
+    width: 100%;
+    min-height: 650px;
+  }
+
+  .custom-product__zoom-icon {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    color: var(--product-heading-color);
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(8px);
+  }
+
+  .custom-product__zoom-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .custom-product__badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2;
+    display: inline-flex;
+    padding: 8px 13px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+  }
+
+  .custom-product__badge--sale {
+    background: var(--product-accent-color);
+  }
+
+  .custom-product__badge--sold-out {
+    background: #292929;
+  }
+
+  .custom-product__placeholder {
+    min-height: 600px;
+    overflow: hidden;
+    background: var(--product-card-background);
+    border-radius: var(--product-radius);
+  }
+
+  .custom-product__placeholder-svg {
+    width: 100%;
+    height: 600px;
+  }
+
+  .custom-product__information {
+    min-width: 0;
+  }
+
+  .custom-product__information-inner {
+    position: sticky;
+    top: 30px;
+  }
+
+  .custom-product__vendor {
+    margin: 0 0 12px;
+    color: var(--product-accent-color);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .custom-product__title {
+    margin: 0;
+    color: var(--product-heading-color);
+    font-size: clamp(36px, 4.5vw, 62px);
+    font-weight: 760;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .custom-product__rating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 17px;
+    color: var(--product-muted-color);
+    font-size: 13px;
+  }
+
+  .custom-product__stars {
+    display: flex;
+    gap: 3px;
+    color: #f5a623;
+  }
+
+  .custom-product__stars svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .custom-product__price-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .custom-product__price {
+    color: var(--product-heading-color);
+    font-size: 30px;
+    font-weight: 750;
+    line-height: 1.2;
+  }
+
+  .custom-product__compare-price {
+    color: var(--product-muted-color);
+    font-size: 18px;
+    text-decoration: line-through;
+  }
+
+  .custom-product__price-note {
+    width: 100%;
+    color: var(--product-muted-color);
+    font-size: 12px;
+  }
+
+  .custom-product__short-description {
+    margin-top: 24px;
+    color: var(--product-text-color);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .custom-product__form {
+    margin-top: 32px;
+  }
+
+  .custom-product__field-label {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--product-heading-color);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .custom-product__select-wrapper {
+    position: relative;
+  }
+
+  .custom-product__select {
+    width: 100%;
+    min-height: 56px;
+    padding: 0 52px 0 18px;
+    color: var(--product-heading-color);
+    cursor: pointer;
+    appearance: none;
+    background: var(--product-card-background);
+    border: 1px solid var(--product-border-color);
+    border-radius: 14px;
+    outline: none;
+  }
+
+  .custom-product__select:focus {
+    border-color: var(--product-accent-color);
+  }
+
+  .custom-product__select-icon {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    width: 19px;
+    height: 19px;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .custom-product__availability-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .custom-product__availability {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--product-muted-color);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .custom-product__availability-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  .custom-product__availability.is-available {
+    color: #227a45;
+  }
+
+  .custom-product__availability.is-unavailable {
+    color: #b33c35;
+  }
+
+  .custom-product__sku {
+    color: var(--product-muted-color);
+    font-size: 12px;
+  }
+
+  .custom-product__purchase-row {
+    display: grid;
+    grid-template-columns: 126px minmax(0, 1fr);
+    gap: 14px;
+    align-items: end;
+    margin-top: 26px;
+  }
+
+  .custom-product__quantity-control {
+    display: grid;
+    grid-template-columns: 38px 1fr 38px;
+    min-height: 56px;
+    overflow: hidden;
+    background: var(--product-card-background);
+    border: 1px solid var(--product-border-color);
+    border-radius: 14px;
+  }
+
+  .custom-product__quantity-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--product-heading-color);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+  }
+
+  .custom-product__quantity-button:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .custom-product__quantity-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .custom-product__quantity-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    color: var(--product-heading-color);
+    text-align: center;
+    background: transparent;
+    border: 0;
+    outline: none;
+    appearance: textfield;
+  }
+
+  .custom-product__quantity-input::-webkit-inner-spin-button,
+  .custom-product__quantity-input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+
+  .custom-product__add-button {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    padding: 14px 24px;
+    color: var(--product-button-color);
+    cursor: pointer;
+    background: var(--product-button-background);
+    border: 1px solid var(--product-button-background);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 750;
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .custom-product__add-button:hover:not(:disabled) {
+    background: var(--product-button-hover);
+    border-color: var(--product-button-hover);
+    transform: translateY(-2px);
+  }
+
+  .custom-product__add-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .custom-product__add-button svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .custom-product__dynamic-checkout {
+    margin-top: 12px;
+  }
+
+  .custom-product__dynamic-checkout .shopify-payment-button__button {
+    min-height: 54px;
+    overflow: hidden;
+    border-radius: 14px;
+  }
+
+  .custom-product__form-error {
+    margin-top: 14px;
+    padding: 12px 14px;
+    color: #a82d27;
+    font-size: 13px;
+    background: #fff0ef;
+    border-radius: 10px;
+  }
+
+  .custom-product__benefits {
+    display: grid;
+    gap: 15px;
+    margin-top: 30px;
+    padding: 24px 0;
+    border-top: 1px solid var(--product-border-color);
+    border-bottom: 1px solid var(--product-border-color);
+  }
+
+  .custom-product__benefit {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 13px;
+    align-items: start;
+  }
+
+  .custom-product__benefit svg {
+    width: 24px;
+    height: 24px;
+    color: var(--product-accent-color);
+  }
+
+  .custom-product__benefit strong,
+  .custom-product__benefit span {
+    display: block;
+  }
+
+  .custom-product__benefit strong {
+    color: var(--product-heading-color);
+    font-size: 13px;
+  }
+
+  .custom-product__benefit span {
+    margin-top: 3px;
+    color: var(--product-muted-color);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .custom-product__accordion {
+    border-bottom: 1px solid var(--product-border-color);
+  }
+
+  .custom-product__accordion summary {
+    display: flex;
+    min-height: 66px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--product-heading-color);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    list-style: none;
+  }
+
+  .custom-product__accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .custom-product__accordion summary svg {
+    width: 19px;
+    height: 19px;
+    transition: transform 180ms ease;
+  }
+
+  .custom-product__accordion[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .custom-product__description {
+    padding-bottom: 28px;
+    color: var(--product-text-color);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .custom-product__description > * + * {
+    margin-top: 16px;
+  }
+
+  .custom-product__lightbox {
+    width: min(94vw, 1200px);
+    max-width: none;
+    max-height: 94vh;
+    padding: 0;
+    overflow: hidden;
+    background: #ffffff;
+    border: 0;
+    border-radius: 18px;
+  }
+
+  .custom-product__lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.82);
+  }
+
+  .custom-product__lightbox-image {
+    width: 100%;
+    max-height: 94vh;
+    object-fit: contain;
+  }
+
+  .custom-product__lightbox-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    display: flex;
+    width: 43px;
+    height: 43px;
+    align-items: center;
+    justify-content: center;
+    color: #111111;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.9);
+    border: 0;
+    border-radius: 50%;
+  }
+
+  .custom-product__lightbox-close svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .custom-product button:focus-visible,
+  .custom-product select:focus-visible,
+  .custom-product input:focus-visible,
+  .custom-product summary:focus-visible {
+    outline: 2px solid var(--product-accent-color);
+    outline-offset: 3px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .custom-product__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .custom-product__information-inner {
+      position: static;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .custom-product__container {
+      width: 100%;
+      padding: 0 0 60px;
+    }
+
+    .custom-product__layout {
+      gap: 32px;
+    }
+
+    .custom-product__gallery {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 12px;
+    }
+
+    .custom-product__main-media {
+      border-right: 0;
+      border-left: 0;
+      border-radius: 0;
+    }
+
+    .custom-product__image {
+      min-height: 430px;
+    }
+
+    .custom-product__thumbnails {
+      flex-direction: row;
+      max-height: none;
+      padding: 0 16px 4px;
+      overflow-x: auto;
+    }
+
+    .custom-product__thumbnail {
+      width: 68px;
+      height: 78px;
+      flex: 0 0 auto;
+    }
+
+    .custom-product__information {
+      padding: 0 18px;
+    }
+
+    .custom-product__title {
+      font-size: 38px;
+    }
+
+    .custom-product__purchase-row {
+      grid-template-columns: 1fr;
+    }
+
+    .custom-product__quantity {
+      width: 140px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .custom-product__thumbnail,
+    .custom-product__add-button,
+    .custom-product__accordion summary svg {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (() => {
+    const section = document.getElementById('ProductSection-{{ section.id }}');
+
+    if (!section) return;
+
+    const variantSelect = section.querySelector('[data-variant-select]');
+    const variantInput = section.querySelector('[data-variant-id]');
+    const price = section.querySelector('[data-product-price]');
+    const comparePrice = section.querySelector('[data-product-compare-price]');
+    const availability = section.querySelector('[data-product-availability]');
+    const availabilityText = section.querySelector('[data-product-availability-text]');
+    const skuWrapper = section.querySelector('[data-product-sku-wrapper]');
+    const sku = section.querySelector('[data-product-sku]');
+    const addButton = section.querySelector('[data-add-to-cart]');
+    const addButtonText = section.querySelector('[data-add-to-cart-text]');
+    const dynamicCheckout = section.querySelector('[data-dynamic-checkout]');
+    const quantityInput = section.querySelector('[data-quantity-input]');
+    const minusButton = section.querySelector('[data-quantity-minus]');
+    const plusButton = section.querySelector('[data-quantity-plus]');
+    const thumbnails = section.querySelectorAll('[data-product-thumbnail]');
+    const mediaItems = section.querySelectorAll('[data-product-media]');
+    const zoomButtons = section.querySelectorAll('[data-product-zoom]');
+    const lightbox = section.querySelector('[data-product-lightbox]');
+    const lightboxImage = section.querySelector('[data-lightbox-image]');
+    const lightboxClose = section.querySelector('[data-lightbox-close]');
+    const lowStockThreshold = {{ section.settings.low_stock_threshold | json }};
+
+    const activateMedia = (mediaId) => {
+      if (!mediaId) return;
+
+      mediaItems.forEach((item) => {
+        const active = item.dataset.mediaId === String(mediaId);
+
+        item.hidden = !active;
+        item.classList.toggle('is-active', active);
+      });
+
+      thumbnails.forEach((thumbnail) => {
+        const active = thumbnail.dataset.mediaId === String(mediaId);
+
+        thumbnail.classList.toggle('is-active', active);
+        thumbnail.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+    };
+
+    thumbnails.forEach((thumbnail) => {
+      thumbnail.addEventListener('click', () => {
+        activateMedia(thumbnail.dataset.mediaId);
+      });
+    });
+
+    if (variantSelect) {
+      variantSelect.addEventListener('change', () => {
+        const option = variantSelect.options[variantSelect.selectedIndex];
+        const available = option.dataset.available === 'true';
+        const inventory = Number(option.dataset.inventory || 0);
+        const compareValue = Number(option.dataset.comparePrice || 0);
+        const priceValue = Number(option.dataset.price || 0);
+        const selectedSku = option.dataset.sku || '';
+        const mediaId = option.dataset.mediaId;
+        const variantUrl = option.dataset.url;
+
+        variantInput.value = option.value;
+        price.textContent = option.dataset.priceFormatted;
+
+        if (compareValue > priceValue) {
+          comparePrice.textContent = option.dataset.comparePriceFormatted;
+          comparePrice.hidden = false;
+        } else {
+          comparePrice.textContent = '';
+          comparePrice.hidden = true;
+        }
+
+        availability.classList.toggle('is-available', available);
+        availability.classList.toggle('is-unavailable', !available);
+
+        if (available) {
+          availabilityText.textContent =
+            inventory > 0 && inventory <= lowStockThreshold
+              ? `Only ${inventory} left in stock`
+              : 'In stock and ready to ship';
+
+          addButton.disabled = false;
+          addButtonText.textContent = 'Add to cart';
+
+          if (dynamicCheckout) {
+            dynamicCheckout.hidden = false;
+          }
+        } else {
+          availabilityText.textContent = 'Currently unavailable';
+          addButton.disabled = true;
+          addButtonText.textContent = 'Sold out';
+
+          if (dynamicCheckout) {
+            dynamicCheckout.hidden = true;
+          }
+        }
+
+        if (sku && skuWrapper) {
+          sku.textContent = selectedSku;
+          skuWrapper.hidden = selectedSku.length === 0;
+        }
+
+        if (mediaId) {
+          activateMedia(mediaId);
+        }
+
+        if (variantUrl && window.history.replaceState) {
+          window.history.replaceState({}, '', variantUrl);
+        }
+      });
+    }
+
+    if (minusButton && quantityInput) {
+      minusButton.addEventListener('click', () => {
+        const currentValue = Number(quantityInput.value) || 1;
+        quantityInput.value = Math.max(1, currentValue - 1);
+      });
+    }
+
+    if (plusButton && quantityInput) {
+      plusButton.addEventListener('click', () => {
+        const currentValue = Number(quantityInput.value) || 1;
+        quantityInput.value = currentValue + 1;
+      });
+    }
+
+    if (quantityInput) {
+      quantityInput.addEventListener('change', () => {
+        const value = Number(quantityInput.value);
+
+        if (!Number.isInteger(value) || value < 1) {
+          quantityInput.value = 1;
+        }
+      });
+    }
+
+    zoomButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        if (!lightbox || !lightboxImage) return;
+
+        const image = button.querySelector('img');
+
+        if (!image) return;
+
+        lightboxImage.src = image.currentSrc || image.src;
+        lightboxImage.alt = image.alt;
+
+        if (typeof lightbox.showModal === 'function') {
+          lightbox.showModal();
+        }
+      });
+    });
+
+    if (lightboxClose && lightbox) {
+      lightboxClose.addEventListener('click', () => {
+        lightbox.close();
+      });
+
+      lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+          lightbox.close();
+        }
+      });
+    }
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "t:general.product",
-  "settings": [],
+  "name": "Professional product",
+  "tag": "section",
+  "class": "professional-product-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "Show SKU",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show rating placeholder",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rating_text",
+      "label": "Rating text",
+      "default": "4.9 · Customer favorite"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price_note",
+      "label": "Show price note",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "price_note",
+      "label": "Price note",
+      "default": "Taxes calculated at checkout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_short_description",
+      "label": "Show short description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "description_words",
+      "label": "Short description length",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "default": 35
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show full product description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_badge",
+      "label": "Show sale badge",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "low_stock_threshold",
+      "label": "Low-stock threshold",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Purchase benefits"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_benefits",
+      "label": "Show purchase benefits",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "delivery_heading",
+      "label": "Delivery heading",
+      "default": "Fast delivery"
+    },
+    {
+      "type": "text",
+      "id": "delivery_text",
+      "label": "Delivery text",
+      "default": "Carefully packed and shipped quickly"
+    },
+    {
+      "type": "text",
+      "id": "secure_heading",
+      "label": "Secure checkout heading",
+      "default": "Secure checkout"
+    },
+    {
+      "type": "text",
+      "id": "secure_text",
+      "label": "Secure checkout text",
+      "default": "Your payment information is protected"
+    },
+    {
+      "type": "text",
+      "id": "returns_heading",
+      "label": "Returns heading",
+      "default": "Easy returns"
+    },
+    {
+      "type": "text",
+      "id": "returns_text",
+      "label": "Returns text",
+      "default": "Simple and convenient return process"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content maximum width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Image corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Page background",
+      "default": "#f7f7f5"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Media background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#5f5f5f"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted text color",
+      "default": "#858585"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#b27b49"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Add-to-cart background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Add-to-cart text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Add-to-cart hover",
+      "default": "#b27b49"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e4e4e0"
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }

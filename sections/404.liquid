@@ -1,23 +1,832 @@
 {% comment %}
-  This section is used in the 404 template to render page shown when customers
-  enter an invalid store URL.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/404
+  Custom professional 404 page
+  Built from scratch for a Shopify custom skeleton theme.
 {% endcomment %}
 
-<h1>{{ '404.title' | t }}</h1>
+<section
+  class="custom-404"
+  style="
+    --section-background: {{ section.settings.background_color }};
+    --card-background: {{ section.settings.card_background }};
+    --heading-color: {{ section.settings.heading_color }};
+    --text-color: {{ section.settings.text_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --button-background: {{ section.settings.button_background }};
+    --button-text-color: {{ section.settings.button_text_color }};
+    --button-hover-background: {{ section.settings.button_hover_background }};
+    --button-hover-text-color: {{ section.settings.button_hover_text_color }};
+  "
+>
+  <div class="custom-404__decor custom-404__decor--one"></div>
+  <div class="custom-404__decor custom-404__decor--two"></div>
 
-<p>
-  {{ '404.not_found' | t }}
-</p>
+  <div class="custom-404__container">
+    <div class="custom-404__card">
+      <div class="custom-404__visual" aria-hidden="true">
+        <span class="custom-404__number">4</span>
 
-<a href="{{ routes.all_products_collection_url }}">
-  {{ '404.back_to_shopping' | t }}
-</a>
+        <div class="custom-404__icon">
+          <svg
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle
+              cx="54"
+              cy="54"
+              r="35"
+              stroke="currentColor"
+              stroke-width="8"
+            />
+
+            <path
+              d="M79 79L105 105"
+              stroke="currentColor"
+              stroke-width="8"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M42 46C45 42 49 40 54 40C62 40 68 45 68 52C68 58 64 61 59 64C56 66 54 68 54 73"
+              stroke="currentColor"
+              stroke-width="5"
+              stroke-linecap="round"
+            />
+
+            <circle
+              cx="54"
+              cy="82"
+              r="3.5"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
+
+        <span class="custom-404__number">4</span>
+      </div>
+
+      <div class="custom-404__content">
+        {% if section.settings.eyebrow != blank %}
+          <p class="custom-404__eyebrow">
+            {{ section.settings.eyebrow | escape }}
+          </p>
+        {% endif %}
+
+        <h1 class="custom-404__heading">
+          {{ section.settings.heading | escape }}
+        </h1>
+
+        {% if section.settings.description != blank %}
+          <div class="custom-404__description">
+            {{ section.settings.description }}
+          </div>
+        {% endif %}
+
+        <div class="custom-404__actions">
+          <a
+            class="custom-404__button custom-404__button--primary"
+            href="{{ section.settings.primary_button_link | default: routes.root_url }}"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 11.5L12 4L21 11.5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M5.5 10V20H18.5V10"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M9.5 20V14H14.5V20"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            {{ section.settings.primary_button_label | escape }}
+          </a>
+
+          {% if section.settings.secondary_button_label != blank %}
+            <a
+              class="custom-404__button custom-404__button--secondary"
+              href="{{ section.settings.secondary_button_link | default: routes.all_products_collection_url }}"
+            >
+              {{ section.settings.secondary_button_label | escape }}
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12H19"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+
+                <path
+                  d="M14 7L19 12L14 17"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+          {% endif %}
+        </div>
+
+        {% if section.settings.show_search %}
+          <div class="custom-404__search-wrapper">
+            <p class="custom-404__search-title">
+              {{ section.settings.search_heading | escape }}
+            </p>
+
+            <form
+              class="custom-404__search"
+              action="{{ routes.search_url }}"
+              method="get"
+              role="search"
+            >
+              <label
+                class="visually-hidden"
+                for="custom-404-search-{{ section.id }}"
+              >
+                {{ section.settings.search_placeholder | escape }}
+              </label>
+
+              <input
+                id="custom-404-search-{{ section.id }}"
+                class="custom-404__search-input"
+                type="search"
+                name="q"
+                value="{{ search.terms | escape }}"
+                placeholder="{{ section.settings.search_placeholder | escape }}"
+                autocomplete="off"
+              >
+
+              <input type="hidden" name="options[prefix]" value="last">
+
+              <button
+                class="custom-404__search-button"
+                type="submit"
+                aria-label="{{ section.settings.search_button_label | escape }}"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="6.5"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+
+                  <path
+                    d="M16 16L21 21"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </form>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_help_links %}
+          <div class="custom-404__links">
+            {% if section.settings.link_one_label != blank %}
+              <a href="{{ section.settings.link_one_url | default: routes.all_products_collection_url }}">
+                {{ section.settings.link_one_label | escape }}
+              </a>
+            {% endif %}
+
+            {% if section.settings.link_two_label != blank %}
+              <a href="{{ section.settings.link_two_url | default: routes.search_url }}">
+                {{ section.settings.link_two_label | escape }}
+              </a>
+            {% endif %}
+
+            {% if section.settings.link_three_label != blank %}
+              <a href="{{ section.settings.link_three_url | default: routes.root_url }}">
+                {{ section.settings.link_three_label | escape }}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% style %}
+  .custom-404 {
+    position: relative;
+    display: flex;
+    min-height: calc(100vh - 80px);
+    padding: 80px 20px;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--accent-color) 15%, transparent),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at bottom right,
+        color-mix(in srgb, var(--accent-color) 12%, transparent),
+        transparent 40%
+      ),
+      var(--section-background);
+  }
+
+  .custom-404 *,
+  .custom-404 *::before,
+  .custom-404 *::after {
+    box-sizing: border-box;
+  }
+
+  .custom-404__container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .custom-404__card {
+    position: relative;
+    width: 100%;
+    padding: 70px 50px;
+    overflow: hidden;
+    text-align: center;
+    background: var(--card-background);
+    border: 1px solid color-mix(in srgb, var(--heading-color) 10%, transparent);
+    border-radius: 32px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.08);
+  }
+
+  .custom-404__visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vw, 24px);
+    margin-bottom: 30px;
+    color: var(--accent-color);
+  }
+
+  .custom-404__number {
+    font-size: clamp(85px, 14vw, 180px);
+    font-weight: 800;
+    line-height: 0.8;
+    letter-spacing: -0.08em;
+  }
+
+  .custom-404__icon {
+    display: flex;
+    width: clamp(80px, 11vw, 145px);
+    height: clamp(80px, 11vw, 145px);
+    align-items: center;
+    justify-content: center;
+    animation: custom-404-float 4s ease-in-out infinite;
+  }
+
+  .custom-404__icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .custom-404__content {
+    width: min(100%, 720px);
+    margin: 0 auto;
+  }
+
+  .custom-404__eyebrow {
+    margin: 0 0 12px;
+    color: var(--accent-color);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .custom-404__heading {
+    margin: 0;
+    color: var(--heading-color);
+    font-size: clamp(34px, 5vw, 62px);
+    font-weight: 750;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .custom-404__description {
+    max-width: 620px;
+    margin: 22px auto 0;
+    color: var(--text-color);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .custom-404__description p {
+    margin: 0;
+  }
+
+  .custom-404__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 34px;
+  }
+
+  .custom-404__button {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .custom-404__button svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+
+  .custom-404__button:hover {
+    transform: translateY(-2px);
+  }
+
+  .custom-404__button:focus-visible,
+  .custom-404__search-input:focus-visible,
+  .custom-404__search-button:focus-visible,
+  .custom-404__links a:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+  }
+
+  .custom-404__button--primary {
+    color: var(--button-text-color);
+    background: var(--button-background);
+    box-shadow: 0 12px 30px
+      color-mix(in srgb, var(--button-background) 25%, transparent);
+  }
+
+  .custom-404__button--primary:hover {
+    color: var(--button-hover-text-color);
+    background: var(--button-hover-background);
+  }
+
+  .custom-404__button--secondary {
+    color: var(--heading-color);
+    background: transparent;
+    border-color: color-mix(in srgb, var(--heading-color) 20%, transparent);
+  }
+
+  .custom-404__button--secondary:hover {
+    color: var(--button-text-color);
+    background: var(--button-background);
+    border-color: var(--button-background);
+  }
+
+  .custom-404__search-wrapper {
+    width: min(100%, 560px);
+    margin: 46px auto 0;
+    padding-top: 34px;
+    border-top: 1px solid
+      color-mix(in srgb, var(--heading-color) 10%, transparent);
+  }
+
+  .custom-404__search-title {
+    margin: 0 0 14px;
+    color: var(--heading-color);
+    font-size: 15px;
+    font-weight: 650;
+  }
+
+  .custom-404__search {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 56px;
+    background: var(--section-background);
+    border: 1px solid
+      color-mix(in srgb, var(--heading-color) 12%, transparent);
+    border-radius: 999px;
+  }
+
+  .custom-404__search-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0 70px 0 24px;
+    color: var(--heading-color);
+    font: inherit;
+    font-size: 15px;
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+
+  .custom-404__search-input::placeholder {
+    color: color-mix(in srgb, var(--text-color) 70%, transparent);
+  }
+
+  .custom-404__search-button {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    display: flex;
+    width: 43px;
+    height: 43px;
+    align-items: center;
+    justify-content: center;
+    color: var(--button-text-color);
+    cursor: pointer;
+    background: var(--button-background);
+    border: 0;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .custom-404__search-button:hover {
+    background: var(--button-hover-background);
+    transform: translateY(-50%) scale(1.04);
+  }
+
+  .custom-404__search-button svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .custom-404__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 24px;
+    margin-top: 26px;
+  }
+
+  .custom-404__links a {
+    position: relative;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .custom-404__links a::after {
+    position: absolute;
+    right: 0;
+    bottom: -4px;
+    left: 0;
+    height: 1px;
+    content: "";
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 180ms ease;
+  }
+
+  .custom-404__links a:hover {
+    color: var(--accent-color);
+  }
+
+  .custom-404__links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .custom-404__decor {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  .custom-404__decor--one {
+    top: 10%;
+    left: -80px;
+    width: 220px;
+    height: 220px;
+    background: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  }
+
+  .custom-404__decor--two {
+    right: -90px;
+    bottom: 5%;
+    width: 280px;
+    height: 280px;
+    background: color-mix(in srgb, var(--accent-color) 22%, transparent);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+  }
+
+  @keyframes custom-404-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .custom-404 {
+      min-height: calc(100vh - 60px);
+      padding: 40px 16px;
+    }
+
+    .custom-404__card {
+      padding: 50px 20px;
+      border-radius: 24px;
+    }
+
+    .custom-404__visual {
+      margin-bottom: 26px;
+    }
+
+    .custom-404__description {
+      margin-top: 18px;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .custom-404__actions {
+      flex-direction: column;
+      margin-top: 28px;
+    }
+
+    .custom-404__button {
+      width: 100%;
+    }
+
+    .custom-404__search-wrapper {
+      margin-top: 36px;
+      padding-top: 28px;
+    }
+
+    .custom-404__links {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .custom-404__icon {
+      animation: none;
+    }
+
+    .custom-404__button,
+    .custom-404__search-button,
+    .custom-404__links a::after {
+      transition: none;
+    }
+  }
+{% endstyle %}
 
 {% schema %}
 {
-  "name": "t:general.404",
-  "settings": []
+  "name": "Professional 404 page",
+  "tag": "section",
+  "class": "custom-404-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Page not found"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Looks like you took a wrong turn"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>The page you are looking for may have been moved, deleted, or never existed. Let us help you find your way back.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Primary button"
+    },
+    {
+      "type": "text",
+      "id": "primary_button_label",
+      "label": "Button label",
+      "default": "Return home"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Secondary button"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_label",
+      "label": "Button label",
+      "default": "Continue shopping"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_heading",
+      "label": "Search heading",
+      "default": "Search for what you need"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search products..."
+    },
+    {
+      "type": "text",
+      "id": "search_button_label",
+      "label": "Search button accessibility label",
+      "default": "Submit search"
+    },
+    {
+      "type": "header",
+      "content": "Helpful links"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_help_links",
+      "label": "Show helpful links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "link_one_label",
+      "label": "First link label",
+      "default": "Shop all products"
+    },
+    {
+      "type": "url",
+      "id": "link_one_url",
+      "label": "First link URL"
+    },
+    {
+      "type": "text",
+      "id": "link_two_label",
+      "label": "Second link label",
+      "default": "Search store"
+    },
+    {
+      "type": "url",
+      "id": "link_two_url",
+      "label": "Second link URL"
+    },
+    {
+      "type": "text",
+      "id": "link_three_label",
+      "label": "Third link label",
+      "default": "Go to homepage"
+    },
+    {
+      "type": "url",
+      "id": "link_three_url",
+      "label": "Third link URL"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Page background",
+      "default": "#f5f5f2"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#b58b5b"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Button hover background",
+      "default": "#b58b5b"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button hover text color",
+      "default": "#ffffff"
+    }
+  ]
 }
 {% endschema %}

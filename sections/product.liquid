@@ -595,19 +595,20 @@
   }
 
   .custom-product__container {
-    width: min(calc(100% - 48px), var(--product-width));
+    width: min(calc(100% - 64px), var(--product-width));
     margin: 0 auto;
-    padding: 64px 0 96px;
+    padding: 56px 0 96px;
   }
 
   .custom-product__layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(390px, 0.9fr);
-    gap: clamp(40px, 6vw, 90px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(36px, 4vw, 70px);
     align-items: start;
   }
 
   .custom-product__media {
+    width: 100%;
     min-width: 0;
   }
 
@@ -661,7 +662,7 @@
 .custom-product__main-media {
   position: relative;
   width: 100%;
-  height: auto;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   background: var(--product-card-background);
   border: 1px solid var(--product-border-color);
@@ -670,7 +671,7 @@
 
 .custom-product__media-item {
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 .custom-product__media-item[hidden] {
@@ -681,7 +682,7 @@
   position: relative;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   padding: 0;
   cursor: zoom-in;
   background: transparent;
@@ -691,18 +692,18 @@
 .custom-product__image {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   max-width: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
   .custom-product__video,
   .custom-product__model {
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
   }
 
   .custom-product__zoom-icon {
@@ -1196,6 +1197,8 @@
     }
 
     .custom-product__main-media {
+      width: 100%;
+      aspect-ratio: 1 / 1;
       border-right: 0;
       border-left: 0;
       border-radius: 0;
@@ -1203,8 +1206,10 @@
 
     .custom-product__image {
       width: 100%;
-      height: auto;
+      height: 100%;
       min-height: 0;
+      object-fit: cover;
+      object-position: center;
     }
 
     .custom-product__thumbnails {
